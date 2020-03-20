@@ -1,0 +1,56 @@
+/* Created on 19/11/2019 by EssExx */
+
+.historyPanel {
+    top: 0;
+    left: 0;
+    min-width: 300px;
+    position: fixed;
+    padding-top: 5px;
+    padding-bottom: 6px;
+    z-index: 30000000001!important;
+    display: block;
+    font-size: 12px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-color: #1E1E1E;
+    border-radius: 0 0 8px 8px;
+}
+
+.entry {
+    height: 16px;
+    padding: 5px;
+}
+
+.icon {
+    width: 16px;
+    height: 16px;
+    margin: 5px 10px 5px 16px;
+    background-color: #1E1E1E;
+}
+
+.text {
+    color: white;
+    max-width: 500px;
+    margin-right: 30px;
+    overflow : hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+}
+
+.link {
+    display: flex;
+    align-items: center;
+    opacity: 1;
+    text-decoration: none;
+}
+
+.link:hover {
+    text-decoration: none;
+    background-color: #4B4B4B;
+}
+

@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e726f0f0-9d3a-4b7d-b40c-1b78dfe7bab0" name="Default Changelist" comment="" />
+    <list default="true" id="e726f0f0-9d3a-4b7d-b40c-1b78dfe7bab0" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/bg_history.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/history.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/history.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/background.js" beforeDir="false" afterPath="$PROJECT_DIR$/background.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content.js" beforeDir="false" afterPath="$PROJECT_DIR$/content.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/manifest.json" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -11,6 +19,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="JavaScript File" />
+        <option value="CSS File" />
       </list>
     </option>
   </component>
@@ -24,7 +33,9 @@
     <auto-save>true</auto-save>
   </component>
   <component name="ProjectId" id="1TqYkBl57sPKzuxBh0DMbwjUsDE" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showExcludedFiles" value="true" />
@@ -35,6 +46,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="jsx.switch.disabled" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="list.type.of.created.stylesheet" value="CSS" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -44,7 +56,7 @@
     <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.0" />
-    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.General" />
+    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
   </component>
   <component name="ServiceViewManager">
     <option name="viewStates">
@@ -98,6 +110,50 @@
       <workItem from="1575642324520" duration="186000" />
       <workItem from="1575678639998" duration="2333000" />
       <workItem from="1575687148202" duration="3237000" />
+      <workItem from="1575862955082" duration="405000" />
+      <workItem from="1575863374904" duration="350000" />
+      <workItem from="1575863786536" duration="334000" />
+      <workItem from="1575864129522" duration="5686000" />
+      <workItem from="1576168771168" duration="1360000" />
+      <workItem from="1576535971277" duration="662000" />
+      <workItem from="1576987797526" duration="18000" />
+      <workItem from="1576987834870" duration="258000" />
+      <workItem from="1577245352732" duration="67000" />
+      <workItem from="1577245566299" duration="762000" />
+      <workItem from="1577343223396" duration="535000" />
+      <workItem from="1577423498789" duration="15000" />
+      <workItem from="1577424999370" duration="735000" />
+      <workItem from="1578435274583" duration="716000" />
+      <workItem from="1578460472862" duration="126000" />
+      <workItem from="1578522532367" duration="18000" />
+      <workItem from="1579678960303" duration="581000" />
+      <workItem from="1579880370301" duration="101000" />
+      <workItem from="1579880498683" duration="520000" />
+      <workItem from="1580223070772" duration="13000" />
+      <workItem from="1580233603633" duration="6779000" />
+      <workItem from="1580248032632" duration="62000" />
+      <workItem from="1580273390437" duration="610000" />
+      <workItem from="1580309637278" duration="507000" />
+      <workItem from="1580355949039" duration="118000" />
+      <workItem from="1580356261140" duration="1203000" />
+      <workItem from="1580366444006" duration="90000" />
+      <workItem from="1580366548117" duration="777000" />
+      <workItem from="1580450701116" duration="61000" />
+      <workItem from="1580605256270" duration="1603000" />
+      <workItem from="1580657070954" duration="96000" />
+      <workItem from="1580752903076" duration="160000" />
+      <workItem from="1580881566566" duration="22000" />
+      <workItem from="1580882289676" duration="462000" />
+      <workItem from="1581031137195" duration="345000" />
+      <workItem from="1581135098056" duration="1343000" />
+      <workItem from="1581238196721" duration="623000" />
+      <workItem from="1581883491153" duration="389000" />
+      <workItem from="1582173566108" duration="67000" />
+      <workItem from="1582177986784" duration="119000" />
+      <workItem from="1584201416007" duration="1117000" />
+      <workItem from="1584585643589" duration="2030000" />
+      <workItem from="1584603209662" duration="2659000" />
+      <workItem from="1584742700433" duration="444000" />
     </task>
     <servers />
   </component>
@@ -105,29 +161,29 @@
     <option name="version" value="1" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="184" y="112" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1575132618131">
+    <state x="408" y="193" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1579880472762">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state x="184" y="112" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1440.900@0.0.1440.900" timestamp="1575132618131" />
-    <state x="221" y="89" key="SettingsEditor" timestamp="1575731890621">
+    <state x="408" y="193" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1440.900@0.0.1440.900" timestamp="1579880472762" />
+    <state x="303" y="52" key="CommitChangelistDialog2" timestamp="1584743184414">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state x="221" y="89" key="SettingsEditor/0.0.1440.900@0.0.1440.900" timestamp="1575731890621" />
-    <state x="100" y="100" width="1240" height="700" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1575687136571">
+    <state x="303" y="52" key="CommitChangelistDialog2/0.0.1440.900@0.0.1440.900" timestamp="1584743184414" />
+    <state x="221" y="89" width="1186" height="722" key="SettingsEditor" timestamp="1580235387834">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state x="100" y="100" width="1240" height="700" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.1440.900@0.0.1440.900" timestamp="1575687136571" />
-    <state x="385" y="93" width="670" height="714" key="find.popup" timestamp="1575119732324">
+    <state x="221" y="89" width="1186" height="722" key="SettingsEditor/0.0.1440.900@0.0.1440.900" timestamp="1580235387834" />
+    <state x="100" y="100" width="1240" height="700" maximized="true" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1580245805395">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state x="385" y="93" width="670" height="714" key="find.popup/0.0.1440.900@0.0.1440.900" timestamp="1575119732324" />
-    <state x="385" y="210" key="run.anything.popup" timestamp="1575586112548">
+    <state x="100" y="100" width="1240" height="700" maximized="true" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.1440.900@0.0.1440.900" timestamp="1580245805395" />
+    <state x="503" y="374" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1576176811749">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state x="385" y="210" key="run.anything.popup/0.0.1440.900@0.0.1440.900" timestamp="1575586112548" />
-    <state x="385" y="196" width="670" height="676" key="search.everywhere.popup" timestamp="1575691640933">
+    <state x="503" y="374" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1440.900@0.0.1440.900" timestamp="1576176811749" />
+    <state x="385" y="93" width="670" height="714" key="find.popup" timestamp="1576987881177">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state x="385" y="196" width="670" height="676" key="search.everywhere.popup/0.0.1440.900@0.0.1440.900" timestamp="1575691640933" />
+    <state x="385" y="93" width="670" height="714" key="find.popup/0.0.1440.900@0.0.1440.900" timestamp="1576987881177" />
   </component>
 </project>

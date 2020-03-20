@@ -3,10 +3,11 @@
 const digitNumber = 10;
 // const isDigit = n => !isNaN(n);
 
-const tabsTitlePrefix = ['1. ', '2. ', '3. ', '4. ', '5. ',
-    '6. ', '7. ', '8. ',  '9. ', '0. ',
-    '11. ','22. ','33. ', '44. ', '55. ',
-    '66. ', '77. ','88. ', '99. ','00. '];
+const tabsTitlePrefix =
+    ['1. ', '2. ', '3. ', '4. ', '5. ',
+    '6. ', '7. ', '8. ', '9. ', '0. ',
+    '11. ', '22. ', '33. ', '44. ', '55. ',
+    '66. ', '77. ', '88. ', '99. ', '00. '];
 
 const groupBy = key => array =>
     array.reduce((objectsByKeyValue, obj) => {
@@ -18,19 +19,24 @@ const groupBy = key => array =>
 const groupByWindowId = groupBy('windowId');
 
 let isRemovingTab = false,
+    isRemovingTabs = false,
     isMovingTab = false,
     lastDigitTarget = null,
     previousTab = null,
-    currentTab = null;
+    currentTab = null,
+    startTabIndex = -1,
+    parentTabMap = new Map();
 
-chrome.extension.onMessage.addListener(function( message, sender) {
+chrome.extension.onMessage.addListener(function (message, sender) {
     let target = message.target;
     currentTab = sender.tab;
 
     switch (message.type) {
         case 'Digit':
             if (isRemovingTab)
-                alterTab('Digit','removeTab', target, sender);
+                alterTab('Digit', 'removeTab', target, sender);
+            else if (isRemovingTabs)
+                alterTab('Digit', 'removeTabs', target, sender);
             else if (isMovingTab)
                 alterTab('Digit', 'moveTab', target, sender);
             else
@@ -44,19 +50,40 @@ chrome.extension.onMessage.addListener(function( message, sender) {
             break;
         case 'KeyG':
             isRemovingTab = true;
+            isRemovingTabs = false;
+            isMovingTab = false;
+            break;
+        case 'KeyV':
+            isRemovingTab = false;
+            isRemovingTabs = true;
             isMovingTab = false;
             break;
         case 'KeyH':
             isRemovingTab = false;
+            isRemovingTabs = false;
             isMovingTab = true;
             break;
+        case 'KeyX':
+            isRemovingTab = false;
+            isRemovingTabs = false;
+            isMovingTab = false;
+
+            let parentTabId = parentTabMap.get(sender.tab.id);
+            chrome.tabs.remove(sender.tab.id, null);
+
+            if (parentTabId)
+                chrome.tabs.update(parentTabId, {active: true});
+            else
+                chrome.tabs.update(lastActiveTab.id, {active: true});
+
+            break;
         default:
-            return;
+            break;
     }
 });
 
 let alterTab = function (key, operation, target, sender) {
-    chrome.tabs.query( {}, function (tabs) {
+    chrome.tabs.query({}, function (tabs) {
         const groupedTabs = groupByWindowId(tabs);
         const windowTabs = groupedTabs[sender.tab.windowId];
         const len = windowTabs.length;
@@ -70,14 +97,16 @@ let alterTab = function (key, operation, target, sender) {
             else
                 index = target - 1;
 
-                tabOperations(operation, sender, index, windowTabs);
-        } else { doubleClickHandler(key, operation, target, sender, windowTabs); }
+            tabOperations(operation, sender, index, windowTabs);
+        } else {
+            doubleClickHandler(key, operation, target, sender, windowTabs);
+        }
     });
 };
 
 let doubleClickKeys = ['Digit', 'Tab', 'Backspace'];
 let timestamps = {'Digit': 0, 'Tab': 0, 'Backspace': 0};
-const timeout = 200;
+const timeout = 230;
 
 let doubleClickHandler = function (key, operation, target, sender, tabs) {
     let newTimestamp = new Date().getTime(),
@@ -122,6 +151,19 @@ let tabOperations = function (operation, sender, index, tabs) {
         case 'removeTab':
             chrome.tabs.remove(tabId, null);
             break;
+        case 'removeTabs':
+            if (startTabIndex !== -1) {
+                startTabIndex = Math.min(startTabIndex, index);
+                index = Math.max(startTabIndex, index);
+
+                for (let i = startTabIndex; i < index + 1; i++)
+                    chrome.tabs.remove(tabs[i].id, null);
+
+                startTabIndex = -1;
+                isRemovingTabs = false;
+            } else
+                startTabIndex = index;
+            break;
         case 'moveTab':
             chrome.tabs.move(sender.tab.id, {index: index});
             break;
@@ -146,34 +188,38 @@ let tabOperations = function (operation, sender, index, tabs) {
 };
 
 let updateTabsTitle = function () {
-    chrome.tabs.query( {}, function (tabs) {
+    chrome.tabs.query({}, function (tabs) {
         chrome.windows.getAll(function (windows) {
             const groupedTabs = groupByWindowId(tabs);
 
-            windows.forEach(window => {
-                const windowTabs = groupedTabs[window.id];
-                const len = windowTabs.length;
+            try {
+                windows.forEach(window => {
+                    const windowTabs = groupedTabs[window.id];
+                    const len = windowTabs.length;
 
-                let title = null,
-                    prefix = null;
+                    let title = null,
+                        prefix = null;
 
-                for (let i = 0; i < len; i++) {
-                    if (i < tabsTitlePrefix.length) {
-                        title = windowTabs[i].title;
-                        prefix = tabsTitlePrefix[i];
-                        title = prefix + getOriginalTitle(title);
+                    for (let i = 0; i < len; i++) {
+                        if (i < tabsTitlePrefix.length) {
+                            title = windowTabs[i].title;
+                            prefix = tabsTitlePrefix[i];
+                            title = prefix + getOriginalTitle(title.replace(/"/g, " "));
+                        }
+
+                        chrome.tabs.executeScript(windowTabs[i].id,
+                            {code: `document.title = "${title}"`},
+                            () => {
+                                return chrome.runtime.lastError;
+                            });
                     }
-
-                    chrome.tabs.executeScript(windowTabs[i].id,
-                        {code: `document.title = "${title}"`},
-                        () => { return chrome.runtime.lastError; });
-                }
-            });
+                });
+            } catch (e) {}
         });
     });
 };
 
-const getOriginalTitle = function (title) {
+let getOriginalTitle = function (title) {
     const startLength = tabsTitlePrefix[0].length;
     const endLength = tabsTitlePrefix[tabsTitlePrefix.length - 1].length;
 
@@ -188,8 +234,22 @@ const getOriginalTitle = function (title) {
         return title.substring(endLength, title.length)
 };
 
-chrome.tabs.onRemoved.addListener(() => {updateTabsTitle()});
-chrome.tabs.onMoved.addListener(() => updateTabsTitle());
-chrome.tabs.onAttached.addListener(() => updateTabsTitle());
-chrome.tabs.onDetached.addListener(() => updateTabsTitle());
-chrome.tabs.onUpdated.addListener(() => {updateTabsTitle()});
+let lastActiveTab = null;
+
+setInterval(() => {
+    chrome.tabs.query({ active: true, lastFocusedWindow: true },
+        function(tabs) {
+        lastActiveTab = tabs[0];
+    });
+}, timeout);
+
+let handleCreated = function (newTab) {
+    parentTabMap.set(newTab.id, lastActiveTab.id);
+};
+
+chrome.tabs.onCreated.addListener(handleCreated);
+chrome.tabs.onRemoved.addListener(updateTabsTitle);
+chrome.tabs.onMoved.addListener(updateTabsTitle);
+chrome.tabs.onAttached.addListener(updateTabsTitle);
+chrome.tabs.onDetached.addListener(updateTabsTitle);
+chrome.tabs.onUpdated.addListener(updateTabsTitle);

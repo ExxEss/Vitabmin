@@ -2,17 +2,18 @@
     "name": "Vitabmin",
     "version": "1.0",
     "description": "Revolutionary tabs manager.",
-    "permissions": ["nativeMessaging", "debugger", "storage", "tabs",
+    "permissions": ["nativeMessaging", "debugger", "storage", "tabs", "sessions",
          "file://*/*","http://*/*", "https://*/", "background", "history"],
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
     "background": {
-        "scripts": ["background.js"],
+        "scripts": ["background.js", "bg_history.js"],
         "persistent": true
     },
     "content_scripts": [
         {
             "matches": ["<all_urls>",  "*://*/*", "file://*/*"],
-            "js": ["content.js"],
+            "js": ["content.js", "history"],
+            "css": ["history.css"],
             "run_at": "document_start"
         }
     ],

@@ -14,16 +14,16 @@ const isSelectable = function(element) {
 };
 
 const keyCodes = ['Digit0', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5',
-    'Digit6', 'Digit7', 'Digit8', 'Digit9', 'KeyG', 'KeyH', 'Tab', 'Backspace'];
+    'Digit6', 'Digit7', 'Digit8', 'Digit9', 'KeyG', 'KeyH', 'KeyV', 'KeyX', 'Tab', 'Backspace'];
 
 window.addEventListener('keydown', function (e) {
     const activeElement = document.activeElement;
 
-    if (!isSelectable(activeElement)) {
+    if (!isSelectable(activeElement) && !e.shiftKey) {
         let type = null,
             target = keyCodes.indexOf(e.code);
 
-        if (target >= 0) {
+        if (target > -1) {
             e.preventDefault();
             e.stopImmediatePropagation();
 
@@ -37,8 +37,3 @@ window.addEventListener('keydown', function (e) {
         }
     }
 }, true);
-
-// window.onbeforeunload = function(event) {
-//     document.title = document.title.substring(3);
-// };
-
