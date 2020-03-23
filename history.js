@@ -1,23 +1,20 @@
 // Created on 29/01/2020 by EssExx
 
-let backgroundColor = '#1E1E1E';
+const timeout = 230;
+let backgroundColor,
+    historyPanel = document.createElement('div'),
+    isCursorOnPanel = false;
+    historyPanel.className = 'historyPanel';
+    backgroundColor = '#1E1E1E';
     hoverColor = '#4B4B4B';
 
-let historyPanel = document.createElement('div');
-    historyPanel.className = 'historyPanel';
+historyPanel.addEventListener("mouseenter", function() {
+    isCursorOnPanel=true;
+});
 
-const unselectableTypes = ['button', 'checkbox', 'color', 'file',
-    'hidden', 'image', 'radio', 'reset', 'submit'];
-
-const isSelectable = function(element) {
-    if (!(element instanceof Element))
-        return false;
-
-    return (element.nodeName.toLowerCase() === 'input' &&
-        unselectableTypes.indexOf(element.type) === -1) ||
-        element.nodeName.toLowerCase() === 'textarea' ||
-        element.isContentEditable;
-};
+historyPanel.addEventListener("mouseout", function() {
+    isCursorOnPanel=false;
+});
 
 let isSingleKeyEvent = function (e) {
     const activeElement = document.activeElement;
@@ -50,20 +47,43 @@ window.addEventListener("click", (e) => {
     }
 });
 
-// window.onscroll = (e) => {
-//     if (isAlreadyExistsHistoryPanel() && e.target !== historyPanel)
-//     removeHistoryPanel();
-// };
+window.onscroll = (e) => {
+    if (isAlreadyExistsHistoryPanel() && e.target !== historyPanel)
+    removeHistoryPanel();
+};
 
 chrome.extension.onMessage.addListener(function (message) {
-    if (message.history !== undefined)
+    if (message.tabHistory !== undefined) {
         historyPanel.innerHTML = '';
+    }
 
-    while (message.history.length > 0) {
-        let entry = message.history.pop();
+    message.tabHistory.pop();
+
+    while (message.tabHistory.length > 0) {
+        let entry = message.tabHistory.pop();
         historyPanel.appendChild(createLink(entry));
     }
 });
+
+window.setInterval(function () {
+    if (document.title.includes("http://")
+        || document.title.includes("https://")) {
+        let h = [document.querySelectorAll("h1")[0],
+                document.querySelectorAll("h2")[0],
+                document.querySelectorAll("h3")[0],
+                document.querySelectorAll("h4")[0],
+                document.querySelectorAll("h5")[0],
+                document.querySelectorAll("h6")[0]];
+
+        for (let i = 0; i < h.length; i++) {
+            if (h[i] !== undefined && h[i].innerText && h[i].innerText !== "") {
+                document.title = h[i].innerText;
+                chrome.extension.sendMessage({type: "Title", value: h[i].innerText});
+                return;
+            }
+        }
+    }
+}, timeout);
 
 let createLink = function (entry) {
     let link = document.createElement('a');
@@ -75,8 +95,8 @@ let createLink = function (entry) {
     text.className = 'text';
 
     link.href = entry[0];
-    icon.src = entry[2];
     text.innerText = entry[1];
+    icon.src = entry[2];
 
     link.onmouseover = () => { icon.style.background = hoverColor };
     link.onmouseleave = () => { icon.style.background = backgroundColor };

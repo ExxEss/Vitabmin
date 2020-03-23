@@ -1,22 +1,5 @@
 // Created on 19/11/2019 by EssExx
 
-const digitNumber = 10;
-// const isDigit = n => !isNaN(n);
-
-const tabsTitlePrefix =
-    ['1. ', '2. ', '3. ', '4. ', '5. ',
-    '6. ', '7. ', '8. ', '9. ', '0. ',
-    '11. ', '22. ', '33. ', '44. ', '55. ',
-    '66. ', '77. ', '88. ', '99. ', '00. '];
-
-const groupBy = key => array =>
-    array.reduce((objectsByKeyValue, obj) => {
-        const value = obj[key];
-        objectsByKeyValue[value] = (objectsByKeyValue[value] || []).concat(obj);
-        return objectsByKeyValue;
-    }, {});
-
-const groupByWindowId = groupBy('windowId');
 
 let isRemovingTab = false,
     isRemovingTabs = false,
@@ -219,20 +202,6 @@ let updateTabsTitle = function () {
     });
 };
 
-let getOriginalTitle = function (title) {
-    const startLength = tabsTitlePrefix[0].length;
-    const endLength = tabsTitlePrefix[tabsTitlePrefix.length - 1].length;
-
-    let index = Math.max(tabsTitlePrefix.indexOf(title.substring(0, startLength)),
-        tabsTitlePrefix.indexOf(title.substring(0, endLength)));
-
-    if (index < 0)
-        return title;
-    else if (index < digitNumber)
-        return title.substring(startLength, title.length);
-    else
-        return title.substring(endLength, title.length)
-};
 
 let lastActiveTab = null;
 

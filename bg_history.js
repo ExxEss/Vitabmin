@@ -1,18 +1,20 @@
 // 04/02/2020 by EssExx
 
 let history = new Map(),
+    titles = new Map(),
     recentlyClosedTabsHistory = [],
     restoredTabIndex = -1;
 
-let array_move = function(array, oldIndex, newIndex) {
-    if (newIndex >= array.length) {
-        let k = newIndex - array.length + 1;
 
-        while (k--) {
-            array.push(undefined);
-        }
-    }
-    array.splice(newIndex, 0, array.splice(oldIndex, 1)[0]);
+
+const isValidUrl = function (str) {
+    let pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+        '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+        '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+        '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+    return !!pattern.test(str);
 };
 
 let updateTabHistory = function (tab) {
@@ -22,46 +24,83 @@ let updateTabHistory = function (tab) {
     } else {
         if (tab.url === undefined
             || tab.title === undefined
-            || tab.title.includes("http")
-            || tab.favIconUrl === undefined)
+            || tab.favIconUrl === undefined
+            || tab.favIconUrl === "")
             return;
 
-        let newHistoryEntry = [tab.url, tab.title, tab.favIconUrl];
+        let newHistoryEntry = [tab.url, getOriginalTitle(tab.title), tab.favIconUrl];
 
         if (history.has(tab.id)) {
             let tabHistory = history.get(tab.id);
             let len = tabHistory.length;
-            let index = tabHistory.map(
+            let originalTitle = getOriginalTitle(tab.title);
+
+            // Get index of an existed url of tabHistory
+            let urlIndex = tabHistory.map(
                 (entry) => entry[0]).indexOf(
                 newHistoryEntry[0]);
 
-            if (index >= 0 && index < len - 1 && len > 1) {
-                array_move(tabHistory, index, len - 1);
-            } else if (index < 0) {
+            let titleIndex = tabHistory.map(
+                (entry) => entry[1]).indexOf(
+                newHistoryEntry[1]);
+
+            if (isValidUrl(originalTitle) && urlIndex < 0
+                && tab.status === 'complete') {
+
+                let title = titles.get(tab.id);
+
+                if (title) {
+                    newHistoryEntry[1] = title;
+                }
+                tabHistory.push(newHistoryEntry);
+            } else if (!isValidUrl(originalTitle) && urlIndex > -1) {
+                tabHistory.splice(urlIndex, 1);
+                tabHistory.push(newHistoryEntry);
+            } else if (urlIndex > -1 && urlIndex < len - 1 && len > 1) {
+                arrayMove(tabHistory, urlIndex, len - 1);
+            } else if (titleIndex > -1 && titleIndex < len - 1 && len > 1) {
+                arrayMove(tabHistory, titleIndex, len - 1);
+            } else if (urlIndex < 0 && titleIndex < 0) {
                 tabHistory.push(newHistoryEntry);
             }
         } else {
             history.set(tab.id, [newHistoryEntry]);
         }
     }
-    chrome.tabs.sendMessage(tab.id, {history: history.get(tab.id)}, null);
-    console.log(tab.id, history.get(tab.id));
+    // let tabHistory = removeDuplicatedEntry(history.get(tab.id));
+    // history.set(tab.id, tabHistory);
+    chrome.tabs.sendMessage(tab.id, {tabHistory: history.get(tab.id)}, null);
 };
 
-let _updateTabHistory = function (tabId, changeInfo, tab) {
-    updateTabHistory(tab);
+let removeDuplicatedEntry = function (tabHistory) {
+    let len = tabHistory.length;
+
+    for (let i = 0; i < len; i++) {
+        for (let j = i; j < len; j++) {
+            if (tabHistory[i][1] === tabHistory[j][1]) {
+                tabHistory = tabHistory.splice(i, 1);
+                return tabHistory;
+            }
+        }
+    }
 };
 
 let updateClosedTabHistory = function (tabId) {
     recentlyClosedTabsHistory.push(history.get(tabId));
 };
 
-chrome.extension.onMessage.addListener(function (message) {
+let _updateTabHistory = function (tabId, changeInfo, tab) {
+    updateTabHistory(tab);
+};
+
+chrome.extension.onMessage.addListener(function (message, sender) {
     if (message.type === "Restore") {
         chrome.sessions.getRecentlyClosed((sessions) => {
             restoredTabIndex = sessions[0].tab.index;
         });
         chrome.sessions.restore(chrome.sessions[0]);
+    } else if (message.type === "Title") {
+        titles.set(sender.id, message.value);
     }
 });
 
