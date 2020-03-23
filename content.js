@@ -13,8 +13,6 @@ const isSelectable = function(element) {
         element.isContentEditable;
 };
 
-const keyCodes = ['Digit0', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5',
-    'Digit6', 'Digit7', 'Digit8', 'Digit9', 'KeyG', 'KeyH', 'KeyV', 'KeyX', 'Tab', 'Backspace'];
 
 window.addEventListener('keydown', function (e) {
     const activeElement = document.activeElement;
@@ -23,7 +21,7 @@ window.addEventListener('keydown', function (e) {
         let type = null,
             target = keyCodes.indexOf(e.code);
 
-        if (target > -1) {
+        if (target > -1 && !isAlreadyExistsHistoryPanel()) {
             e.preventDefault();
             e.stopImmediatePropagation();
 

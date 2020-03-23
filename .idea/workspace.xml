@@ -1,21 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e726f0f0-9d3a-4b7d-b40c-1b78dfe7bab0" name="Default Changelist" comment="Integration of history module.">
-      <change afterPath="$PROJECT_DIR$/.idea/Vitabmin.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dictionaries/EssExx.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/jsLibraryMappings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/images/extension.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils.js" afterDir="false" />
+    <list default="true" id="e726f0f0-9d3a-4b7d-b40c-1b78dfe7bab0" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/background.js" beforeDir="false" afterPath="$PROJECT_DIR$/background.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bg_history.js" beforeDir="false" afterPath="$PROJECT_DIR$/bg_history.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/history.css" beforeDir="false" afterPath="$PROJECT_DIR$/history.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content.js" beforeDir="false" afterPath="$PROJECT_DIR$/content.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/history.js" beforeDir="false" afterPath="$PROJECT_DIR$/history.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -166,7 +158,9 @@
       <workItem from="1584742700433" duration="25859000" />
       <workItem from="1584850798029" duration="79000" />
       <workItem from="1584897016183" duration="837000" />
-      <workItem from="1584913893992" duration="5077000" />
+      <workItem from="1584913893992" duration="13463000" />
+      <workItem from="1584973472957" duration="637000" />
+      <workItem from="1584975066538" duration="367000" />
     </task>
     <task id="LOCAL-00001" summary="Integration of history module.">
       <created>1584743219551</created>
@@ -175,7 +169,14 @@
       <option name="project" value="LOCAL" />
       <updated>1584743219551</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Integration of history module.">
+      <created>1584926873690</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1584926873690</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -195,10 +196,10 @@
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="408" y="193" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1440.900@0.0.1440.900" timestamp="1579880472762" />
-    <state x="303" y="52" key="CommitChangelistDialog2" timestamp="1584767358724">
+    <state x="303" y="52" key="CommitChangelistDialog2" timestamp="1584926873314">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state x="303" y="52" key="CommitChangelistDialog2/0.0.1440.900@0.0.1440.900" timestamp="1584767358724" />
+    <state x="303" y="52" key="CommitChangelistDialog2/0.0.1440.900@0.0.1440.900" timestamp="1584926873314" />
     <state x="221" y="89" width="1186" height="722" key="SettingsEditor" timestamp="1584770528154">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
@@ -207,10 +208,10 @@
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="100" y="100" width="1240" height="700" maximized="true" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.1440.900@0.0.1440.900" timestamp="1580245805395" />
-    <state x="503" y="374" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1576176811749">
+    <state x="503" y="374" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1584975432224">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state x="503" y="374" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1440.900@0.0.1440.900" timestamp="1576176811749" />
+    <state x="503" y="374" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1440.900@0.0.1440.900" timestamp="1584975432224" />
     <state x="385" y="93" width="670" height="714" key="find.popup" timestamp="1576987881177">
       <screen x="0" y="0" width="1440" height="900" />
     </state>

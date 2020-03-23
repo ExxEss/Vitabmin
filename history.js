@@ -8,13 +8,7 @@ let backgroundColor,
     backgroundColor = '#1E1E1E';
     hoverColor = '#4B4B4B';
 
-historyPanel.addEventListener("mouseenter", function() {
-    isCursorOnPanel=true;
-});
 
-historyPanel.addEventListener("mouseout", function() {
-    isCursorOnPanel=false;
-});
 
 let isSingleKeyEvent = function (e) {
     const activeElement = document.activeElement;
@@ -24,18 +18,40 @@ let isSingleKeyEvent = function (e) {
         !e.metaKey && !e.ctrlKey;
 };
 
+historyPanel.addEventListener("mouseenter", function() {
+    isCursorOnPanel = true;
+});
+
+historyPanel.addEventListener("mouseout", function() {
+    isCursorOnPanel = false;
+});
+
 window.addEventListener('keydown', function (e) {
     if (isSingleKeyEvent(e) && e.key === 'c'
         && !isAlreadyExistsHistoryPanel()) {
+
         e.preventDefault();
         e.stopImmediatePropagation();
         popHistoryPanel();
-    } else if (isSingleKeyEvent(e) && (e.key === 'Escape'
-        || e.key === 'c') &&
-        isAlreadyExistsHistoryPanel()) {
+    } else if (isSingleKeyEvent(e) && (e.key === 'Escape' || e.key === 'c' || isNumber(e))
+        && isAlreadyExistsHistoryPanel()) {
+
         e.preventDefault();
         e.stopImmediatePropagation();
-        removeHistoryPanel();
+
+        if (isNumber(e)) {
+            let index = keyCodes.indexOf(e.code);
+            let len = historyPanel.childNodes.length;
+            index = index === 0 ? digitNumber - 1 : index - 1;
+
+            if (len <= index)
+                index = len - 1;
+
+            let link = historyPanel.childNodes[index];
+            link.style.background = hoverColor;
+            window.location.href = link.href;
+        } else
+            removeHistoryPanel();
     } else if (isSingleKeyEvent(e) && e.key === 'z') {
         chrome.extension.sendMessage({type: "Restore"}, null);
     }
@@ -59,15 +75,15 @@ chrome.extension.onMessage.addListener(function (message) {
 
     message.tabHistory.pop();
 
+    let count = 1;
     while (message.tabHistory.length > 0) {
         let entry = message.tabHistory.pop();
-        historyPanel.appendChild(createLink(entry));
+        historyPanel.appendChild(createLink(entry, count++));
     }
 });
 
 window.setInterval(function () {
-    if (document.title.includes("http://")
-        || document.title.includes("https://")) {
+    if (isValidUrl(document.title)) {
         let h = [document.querySelectorAll("h1")[0],
                 document.querySelectorAll("h2")[0],
                 document.querySelectorAll("h3")[0],
@@ -85,7 +101,7 @@ window.setInterval(function () {
     }
 }, timeout);
 
-let createLink = function (entry) {
+let createLink = function (entry, count) {
     let link = document.createElement('a');
     let icon = document.createElement('img');
     let text = document.createElement('div');
@@ -95,14 +111,20 @@ let createLink = function (entry) {
     text.className = 'text';
 
     link.href = entry[0];
-    text.innerText = entry[1];
     icon.src = entry[2];
+
+    if (count < digitNumber + 1)
+        text.innerText = `${count % 10}. ${entry[1]}`;
+    else
+        text.innerText = entry[1];
+
 
     link.onmouseover = () => { icon.style.background = hoverColor };
     link.onmouseleave = () => { icon.style.background = backgroundColor };
 
     link.appendChild(icon);
     link.appendChild(text);
+
 
     return link;
 };

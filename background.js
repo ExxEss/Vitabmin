@@ -1,6 +1,5 @@
 // Created on 19/11/2019 by EssExx
 
-
 let isRemovingTab = false,
     isRemovingTabs = false,
     isMovingTab = false,
@@ -15,6 +14,9 @@ chrome.extension.onMessage.addListener(function (message, sender) {
     currentTab = sender.tab;
 
     switch (message.type) {
+        case 'Escape':
+            setOperationStatus(false, false, false);
+            break;
         case 'Digit':
             if (isRemovingTab)
                 alterTab('Digit', 'removeTab', target, sender);
@@ -32,24 +34,16 @@ chrome.extension.onMessage.addListener(function (message, sender) {
             alterTab('Backspace', 'moveTabBackward', null, sender);
             break;
         case 'KeyG':
-            isRemovingTab = true;
-            isRemovingTabs = false;
-            isMovingTab = false;
+            setOperationStatus(true, false, false);
             break;
         case 'KeyV':
-            isRemovingTab = false;
-            isRemovingTabs = true;
-            isMovingTab = false;
+            setOperationStatus(false, true, false);
             break;
         case 'KeyH':
-            isRemovingTab = false;
-            isRemovingTabs = false;
-            isMovingTab = true;
+            setOperationStatus(false, false, true);
             break;
         case 'KeyX':
-            isRemovingTab = false;
-            isRemovingTabs = false;
-            isMovingTab = false;
+            setOperationStatus(false, false, false);
 
             let parentTabId = parentTabMap.get(sender.tab.id);
             chrome.tabs.remove(sender.tab.id, null);
@@ -65,7 +59,13 @@ chrome.extension.onMessage.addListener(function (message, sender) {
     }
 });
 
-let alterTab = function (key, operation, target, sender) {
+function setOperationStatus(_isRemovingTab, _isRemovingTabs, _isMovingTab) {
+    isRemovingTab = _isRemovingTab;
+    isRemovingTabs = _isRemovingTabs;
+    isMovingTab = _isMovingTab;
+}
+
+function alterTab(key, operation, target, sender) {
     chrome.tabs.query({}, function (tabs) {
         const groupedTabs = groupByWindowId(tabs);
         const windowTabs = groupedTabs[sender.tab.windowId];
@@ -85,13 +85,13 @@ let alterTab = function (key, operation, target, sender) {
             doubleClickHandler(key, operation, target, sender, windowTabs);
         }
     });
-};
+}
 
 let doubleClickKeys = ['Digit', 'Tab', 'Backspace'];
 let timestamps = {'Digit': 0, 'Tab': 0, 'Backspace': 0};
 const timeout = 230;
 
-let doubleClickHandler = function (key, operation, target, sender, tabs) {
+function doubleClickHandler (key, operation, target, sender, tabs) {
     let newTimestamp = new Date().getTime(),
         index = null;
 
@@ -123,9 +123,9 @@ let doubleClickHandler = function (key, operation, target, sender, tabs) {
         lastDigitTarget = target;
 
     timestamps[key] = newTimestamp;
-};
+}
 
-let tabOperations = function (operation, sender, index, tabs) {
+function tabOperations (operation, sender, index, tabs) {
     let tabId = tabs[index].id;
     isRemovingTab = false;
     isMovingTab = false;
@@ -168,9 +168,9 @@ let tabOperations = function (operation, sender, index, tabs) {
             chrome.tabs.update(tabId, {active: true});
             break;
     }
-};
+}
 
-let updateTabsTitle = function () {
+function updateTabsTitle() {
     chrome.tabs.query({}, function (tabs) {
         chrome.windows.getAll(function (windows) {
             const groupedTabs = groupByWindowId(tabs);
@@ -200,7 +200,7 @@ let updateTabsTitle = function () {
             } catch (e) {}
         });
     });
-};
+}
 
 
 let lastActiveTab = null;
