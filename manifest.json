@@ -6,14 +6,18 @@
          "file://*/*","http://*/*", "https://*/", "background", "history"],
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
     "background": {
-        "scripts": ["background.js", "bg_history.js", "utils.js"],
+        "scripts": ["background/background.js", "background/bg_history.js", "lib/utils.js"],
         "persistent": true
+    },
+    "browser_action": {
+        "default_icon": "images/vitabmin.png",
+        "default_popup": "html/popup.html"
     },
     "content_scripts": [
         {
             "matches": ["<all_urls>",  "*://*/*", "file://*/*"],
-            "js": ["content.js", "history.js", "utils.js"],
-            "css": ["history.css"],
+            "js": ["content/content.js", "content/history.js", "lib/utils.js"],
+            "css": ["css/history.css"],
             "run_at": "document_start"
         }
     ],

@@ -8,8 +8,6 @@ let backgroundColor,
     backgroundColor = '#1E1E1E';
     hoverColor = '#4B4B4B';
 
-
-
 let isSingleKeyEvent = function (e) {
     const activeElement = document.activeElement;
 
@@ -106,9 +104,9 @@ let createLink = function (entry, count) {
     let icon = document.createElement('img');
     let text = document.createElement('div');
 
-    link.className = 'link';
-    icon.className = 'icon';
-    text.className = 'text';
+    link.className = 'history_link';
+    icon.className = 'history_icon';
+    text.className = 'history_text';
 
     link.href = entry[0];
     icon.src = entry[2];

@@ -15,49 +15,90 @@ chrome.extension.onMessage.addListener(function (message, sender) {
 
     switch (message.type) {
         case 'Escape':
-            setOperationStatus(false, false, false);
+            if (!hasModifiers(message))
+                setOperationStatus(false, false, false);
             break;
         case 'Digit':
-            if (isRemovingTab)
-                alterTab('Digit', 'removeTab', target, sender);
-            else if (isRemovingTabs)
-                alterTab('Digit', 'removeTabs', target, sender);
-            else if (isMovingTab)
-                alterTab('Digit', 'moveTab', target, sender);
-            else
-                alterTab('Digit', 'jumpTab', target, sender);
+            if (!hasModifiers(message)) {
+                if (isRemovingTab)
+                    alterTab('Digit', 'removeTab', target, sender);
+                else if (isRemovingTabs)
+                    alterTab('Digit', 'removeTabs', target, sender);
+                else if (isMovingTab)
+                    alterTab('Digit', 'moveTab', target, sender);
+                else
+                    alterTab('Digit', 'jumpTab', target, sender);
+            }
             break;
         case 'Tab':
-            alterTab('Tab', 'moveTabToward', null, sender);
+            if (!hasModifiers(message))
+                alterTab('Tab', 'moveTabToward', null, sender);
             break;
         case 'Backspace':
-            alterTab('Backspace', 'moveTabBackward', null, sender);
+            if (!hasModifiers(message))
+                alterTab('Backspace', 'moveTabBackward', null, sender);
             break;
         case 'KeyG':
-            setOperationStatus(true, false, false);
+            if (!hasModifiers(message))
+                setOperationStatus(true, false, false);
             break;
         case 'KeyV':
-            setOperationStatus(false, true, false);
+            if (!hasModifiers(message))
+                setOperationStatus(false, true, false);
             break;
         case 'KeyH':
-            setOperationStatus(false, false, true);
+            if (!hasModifiers(message))
+                setOperationStatus(false, false, true);
             break;
         case 'KeyX':
-            setOperationStatus(false, false, false);
+            if (!hasModifiers(message)) {
+                setOperationStatus(false, false, false);
 
-            let parentTabId = parentTabMap.get(sender.tab.id);
-            chrome.tabs.remove(sender.tab.id, null);
+                let parentTabId = parentTabMap.get(sender.tab.id);
+                chrome.tabs.remove(sender.tab.id, () => {
+                    if (parentTabId)
+                        chrome.tabs.update(parentTabId, {active: true});
+                    else
+                        chrome.tabs.update(lastActiveTab.id, {active: true});
+                });
+            }
 
-            if (parentTabId)
-                chrome.tabs.update(parentTabId, {active: true});
-            else
-                chrome.tabs.update(lastActiveTab.id, {active: true});
+            break;
+        case 'KeyR':
+            if (message.modifiers['shiftKey']) {
+                setOperationStatus(false, false, false);
 
+                try {
+                    chrome.tabs.query({}, function (tabs) {
+                        for (let i = 0; i < tabs.length; i++) {
+                            chrome.tabs.executeScript(tabs[i].id,
+                                {code: 'window.location.reload()'},
+                                _=> {return chrome.runtime.lastError});
+                        }
+                    })
+                } catch (e) { e = chrome.runtime.lastError}
+            } else
+                chrome.tabs.executeScript(sender.tab.id,
+                    {code: 'window.location.href = window.location.href'},
+                    _=> {return chrome.runtime.lastError});
+            break;
+        case 'Minus':
+            chrome.tabs.query({'currentWindow': true}, function (tabs) {
+                tabOperations('jumpTab', null, tabs.length - 1, tabs);
+            });
             break;
         default:
             break;
     }
 });
+
+function hasModifiers(message) {
+    let modifiers = message.modifiers;
+    return modifiers['shiftKey'] ||
+        modifiers['ctrlKey'] ||
+        modifiers['altKey'] ||
+        modifiers['metaKey'];
+}
 
 function setOperationStatus(_isRemovingTab, _isRemovingTabs, _isMovingTab) {
     isRemovingTab = _isRemovingTab;
