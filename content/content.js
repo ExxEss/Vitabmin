@@ -27,3 +27,28 @@ window.addEventListener('keydown', function (e) {
         }
     }
 }, true);
+
+document.addEventListener('DOMContentLoaded', updateTabTitle);
+
+setInterval(() => {
+    if (window.location.href.includes('youtube.com')
+        || window.location.href.includes('reddit.com')
+        || window.location.href.includes('zhihu.com')
+        || window.location.href.includes('instagram'))
+        updateTabTitle()
+}, 100);
+
+
+window.addEventListener('beforeunload', function () {
+    document.title = getOriginalTitle(document.title);
+    history.replaceState({}, '');
+});
+
+
+function updateTabTitle() {
+    chrome.extension.sendMessage({
+        type: 'GetTabTitlePrefix'
+    }, (response) => {
+        document.title = response.prefix + getOriginalTitle(document.title);
+    })
+}

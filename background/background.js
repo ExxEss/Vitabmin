@@ -9,11 +9,19 @@ let isRemovingTab = false,
     startTabIndex = -1,
     parentTabMap = new Map();
 
-chrome.extension.onMessage.addListener(function (message, sender) {
+chrome.extension.onMessage.addListener(function (message, sender, sendResponse) {
     let target = message.target;
     currentTab = sender.tab;
 
     switch (message.type) {
+        case 'GetTabTitlePrefix':
+            console.log("hssh");
+            let prefix = sender.tab.index < tabsTitlePrefix.length
+                ? tabsTitlePrefix[sender.tab.index]
+                : '';
+
+            sendResponse({prefix: prefix});
+            break;
         case 'Escape':
             if (!hasModifiers(message))
                 setOperationStatus(false, false, false);
@@ -215,30 +223,27 @@ function updateTabsTitle() {
     chrome.tabs.query({}, function (tabs) {
         chrome.windows.getAll(function (windows) {
             const groupedTabs = groupByWindowId(tabs);
+            windows.forEach(window => {
+                const windowTabs = groupedTabs[window.id];
+                const len = windowTabs.length;
 
-            try {
-                windows.forEach(window => {
-                    const windowTabs = groupedTabs[window.id];
-                    const len = windowTabs.length;
+                let title = null,
+                    prefix = null;
 
-                    let title = null,
-                        prefix = null;
-
-                    for (let i = 0; i < len; i++) {
-                        if (i < tabsTitlePrefix.length) {
-                            title = windowTabs[i].title;
-                            prefix = tabsTitlePrefix[i];
-                            title = prefix + getOriginalTitle(title.replace(/"/g, " "));
-                        }
-
-                        chrome.tabs.executeScript(windowTabs[i].id,
-                            {code: `document.title = "${title}"`},
-                            () => {
-                                return chrome.runtime.lastError;
-                            });
+                for (let i = 0; i < len; i++) {
+                    if (i < tabsTitlePrefix.length) {
+                        title = windowTabs[i].title;
+                        prefix = tabsTitlePrefix[i];
+                        title = prefix + getOriginalTitle(title.replace(/"/g, " "));
                     }
-                });
-            } catch (e) {}
+
+                    chrome.tabs.executeScript(windowTabs[i].id,
+                        {code: `document.title = "${title}"`},
+                        () => {
+                            return chrome.runtime.lastError;
+                        });
+                }
+            });
         });
     });
 }
@@ -253,13 +258,17 @@ setInterval(() => {
     });
 }, timeout);
 
-let handleCreated = function (newTab) {
+let setParentTab = function (newTab) {
     parentTabMap.set(newTab.id, lastActiveTab.id);
 };
 
-chrome.tabs.onCreated.addListener(handleCreated);
+chrome.tabs.onCreated.addListener(setParentTab);
 chrome.tabs.onRemoved.addListener(updateTabsTitle);
 chrome.tabs.onMoved.addListener(updateTabsTitle);
 chrome.tabs.onAttached.addListener(updateTabsTitle);
 chrome.tabs.onDetached.addListener(updateTabsTitle);
-chrome.tabs.onUpdated.addListener(updateTabsTitle);
+// chrome.tabs.onUpdated.addListener(((tabId, changeInfo, tab) => {
+//     chrome.tabs.executeScript(tabId,
+//         {code: `history.pushState({page: 1}, "title 1", "?page=1"`},
+//         _=> {return chrome.runtime.lastError});
+// }));
