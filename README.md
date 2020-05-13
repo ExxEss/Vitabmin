@@ -1,11 +1,11 @@
 # Vitabmin
-Powerful tabs manager to empower navagation experience.
+Powerful tabs manager to empower navigation experience.
 
 ### Key binding types
 
 1. Single key 
 2. Multiple keys 
-   1. Diferent keys sequence  
+   1. Different keys sequence  
    2. Double-click key (for number)
    3. Double-click, threefold-click, fourfold-click ...  Same key (for non-number)
 
