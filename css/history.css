@@ -1,6 +1,6 @@
 /* Created on 19/11/2019 by EssExx */
 
-.historyPanel {
+.history_panel {
     top: 0;
     left: 0;
     min-width: 280px;
@@ -23,21 +23,24 @@
 }
 
 .history_entry {
-    height: 16px;
-    padding: 5px;
+    height: 26px;
+    /*padding: 5px;*/
+    display: flex;
+    align-items: center;
+    opacity: 1;
 }
 
 .history_icon {
     width: 16px;
     height: 16px;
-    margin: 5px 10px 5px 16px;
+    margin: 5px 8px 5px 16px;
     background-color: #1E1E1E;
 }
 
 .history_text {
-    color: #EEEEEE;
+    color: #CCCCCC;
     max-width: 500px;
-    margin-right: 30px;
+    margin-right: 16px;
     overflow : hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
@@ -48,12 +51,34 @@
 .history_link {
     display: flex;
     align-items: center;
-    opacity: 1;
     text-decoration: none;
+    margin-right: auto;
 }
 
-.history_link:hover {
+.history_trash_icon {
+    float: right;
+    position: relative;
+    margin-right: 16px;
+    margin-bottom: 4px;
+    width: 16px;
+    height: 16px;
+}
+
+.history_entry:hover {
     text-decoration: none;
     background-color: #4B4B4B;
 }
 
+.history_link:hover {
+    text-decoration: none;
+}
+
+.trash_icon_svg {
+    width: 130%;
+    height: 130%;
+    fill: #1E1E1E;
+}
+
+.trash_icon_svg:hover {
+    fill: rgb(200, 0, 0);
+}

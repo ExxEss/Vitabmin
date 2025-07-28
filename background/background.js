@@ -3,19 +3,34 @@
 let isRemovingTab = false,
     isRemovingTabs = false,
     isMovingTab = false,
+    showCrossTabHistory = false,
+    playVideo = false,
+    muteTab = false,
     lastDigitTarget = null,
     previousTab = null,
     currentTab = null,
     startTabIndex = -1,
-    parentTabMap = new Map();
+    parentTabMap = new Map(),
+    pageChanged = false;
+
+chrome.commands.onCommand.addListener(function (command) {
+    if (command === 'reload') {
+        chrome.tabs.query( {}, function (tabs) {
+            for (let i = 0; i < tabs.length; i++)
+                chrome.tabs.reload(tabs[i].id, {bypassCache: true});
+        });
+    }
+});
 
 chrome.extension.onMessage.addListener(function (message, sender, sendResponse) {
     let target = message.target;
     currentTab = sender.tab;
 
     switch (message.type) {
+        case 'PageChanged':
+            pageChanged = true;
+            break;
         case 'GetTabTitlePrefix':
-            console.log("hssh");
             let prefix = sender.tab.index < tabsTitlePrefix.length
                 ? tabsTitlePrefix[sender.tab.index]
                 : '';
@@ -24,7 +39,8 @@ chrome.extension.onMessage.addListener(function (message, sender, sendResponse) 
             break;
         case 'Escape':
             if (!hasModifiers(message))
-                setOperationStatus(false, false, false);
+                setOperationStatus(false, false, false,
+                    false, false, false);
             break;
         case 'Digit':
             if (!hasModifiers(message)) {
@@ -34,6 +50,12 @@ chrome.extension.onMessage.addListener(function (message, sender, sendResponse) 
                     alterTab('Digit', 'removeTabs', target, sender);
                 else if (isMovingTab)
                     alterTab('Digit', 'moveTab', target, sender);
+                else if (showCrossTabHistory)
+                    alterTab('Digit', 'showCrossTabHistory', target, sender);
+                else if (playVideo)
+                    alterTab('Digit', 'playVideo', target, sender);
+                else if (muteTab)
+                    alterTab('Digit', 'muteTab', target, sender);
                 else
                     alterTab('Digit', 'jumpTab', target, sender);
             }
@@ -48,20 +70,21 @@ chrome.extension.onMessage.addListener(function (message, sender, sendResponse) 
             break;
         case 'KeyG':
             if (!hasModifiers(message))
-                setOperationStatus(true, false, false);
+                setOperationStatus(true, false, false,
+                    false, false, false);
             break;
         case 'KeyV':
             if (!hasModifiers(message))
-                setOperationStatus(false, true, false);
+                setOperationStatus(false, true, false,
+                    false, false, false);
             break;
         case 'KeyH':
             if (!hasModifiers(message))
-                setOperationStatus(false, false, true);
+                setOperationStatus(false, false, true,
+                    false, false, false);
             break;
         case 'KeyX':
             if (!hasModifiers(message)) {
-                setOperationStatus(false, false, false);
-
                 let parentTabId = parentTabMap.get(sender.tab.id);
                 chrome.tabs.remove(sender.tab.id, () => {
                     if (parentTabId)
@@ -71,29 +94,39 @@ chrome.extension.onMessage.addListener(function (message, sender, sendResponse) 
                 });
             }
 
+            setOperationStatus(false, false, false,
+                false, false, false);
+
             break;
         case 'KeyR':
-            if (message.modifiers['shiftKey']) {
-                setOperationStatus(false, false, false);
-
-                try {
-                    chrome.tabs.query({}, function (tabs) {
-                        for (let i = 0; i < tabs.length; i++) {
-                            chrome.tabs.executeScript(tabs[i].id,
-                                {code: 'window.location.reload()'},
-                                _=> {return chrome.runtime.lastError});
-                        }
-                    })
-                } catch (e) { e = chrome.runtime.lastError}
-            } else
+            if (!hasModifiers(message))
                 chrome.tabs.executeScript(sender.tab.id,
                     {code: 'window.location.href = window.location.href'},
-                    _=> {return chrome.runtime.lastError});
+                    _ => {
+                        return chrome.runtime.lastError
+                    });
             break;
         case 'Minus':
             chrome.tabs.query({'currentWindow': true}, function (tabs) {
                 tabOperations('jumpTab', null, tabs.length - 1, tabs);
             });
+            break;
+        case 'KeyW':
+           if (!hasModifiers(message))
+               setOperationStatus(false, false, false,
+                   true, false, false);
+           break;
+        case 'KeyQ':
+            if (!hasModifiers(message))
+                setOperationStatus(false, false, false,
+                    false, true, false);
+            break;
+        case 'KeyU':
+            if (!hasModifiers(message))
+                setOperationStatus(false, false, false,
+                    false, false, true);
+            else if (hasGivenModifiers(message, ['shiftKey']))
+                chrome.tabs.update(sender.tab.id, {muted: !sender.tab.mutedInfo.muted}, null);
             break;
         default:
             break;
@@ -102,16 +135,29 @@ chrome.extension.onMessage.addListener(function (message, sender, sendResponse) 
 
 function hasModifiers(message) {
     let modifiers = message.modifiers;
-    return modifiers['shiftKey'] ||
+    return modifiers &&
+        (modifiers['shiftKey'] ||
         modifiers['ctrlKey'] ||
         modifiers['altKey'] ||
-        modifiers['metaKey'];
+        modifiers['metaKey']);
 }
 
-function setOperationStatus(_isRemovingTab, _isRemovingTabs, _isMovingTab) {
+function hasGivenModifiers(message, modifiers) {
+    modifiers.forEach((modifier) => {
+        if (!message.modifiers[modifier])
+            return false;
+    });
+    return true;
+}
+
+function setOperationStatus(_isRemovingTab, _isRemovingTabs, _isMovingTab,
+                            _showCrossTabHistory, _playVideo, _muteTab) {
     isRemovingTab = _isRemovingTab;
     isRemovingTabs = _isRemovingTabs;
     isMovingTab = _isMovingTab;
+    showCrossTabHistory = _showCrossTabHistory;
+    playVideo = _playVideo;
+    muteTab = _muteTab;
 }
 
 function alterTab(key, operation, target, sender) {
@@ -140,7 +186,7 @@ let doubleClickKeys = ['Digit', 'Tab', 'Backspace'];
 let timestamps = {'Digit': 0, 'Tab': 0, 'Backspace': 0};
 const timeout = 230;
 
-function doubleClickHandler (key, operation, target, sender, tabs) {
+function doubleClickHandler(key, operation, target, sender, tabs) {
     let newTimestamp = new Date().getTime(),
         index = null;
 
@@ -174,12 +220,30 @@ function doubleClickHandler (key, operation, target, sender, tabs) {
     timestamps[key] = newTimestamp;
 }
 
-function tabOperations (operation, sender, index, tabs) {
+function tabOperations(operation, sender, index, tabs) {
     let tabId = tabs[index].id;
     isRemovingTab = false;
     isMovingTab = false;
+    showCrossTabHistory = false;
+    playVideo = false;
+    muteTab = false;
 
     switch (operation) {
+        case 'showCrossTabHistory':
+            chrome.tabs.sendMessage(sender.tab.id,
+                {tabHistory: history.get(tabId),
+                    destineTabId: tabId,
+                    currentPage: false},
+                null);
+            break;
+        case 'playVideo':
+            chrome.tabs.executeScript(tabId,
+                {code: playVideoCode},
+                _=> {return chrome.runtime.lastError});
+            break;
+        case 'muteTab':
+            chrome.tabs.update(tabId, {muted: !tabs[index].mutedInfo.muted}, null);
+            break;
         case 'removeTab':
             chrome.tabs.remove(tabId, null);
             break;
@@ -225,6 +289,10 @@ function updateTabsTitle() {
             const groupedTabs = groupByWindowId(tabs);
             windows.forEach(window => {
                 const windowTabs = groupedTabs[window.id];
+
+                if (windowTabs === undefined)
+                    return
+
                 const len = windowTabs.length;
 
                 let title = null,
@@ -256,19 +324,33 @@ setInterval(() => {
         function(tabs) {
         lastActiveTab = tabs[0];
     });
+    updateTabsTitle();
 }, timeout);
 
 let setParentTab = function (newTab) {
     parentTabMap.set(newTab.id, lastActiveTab.id);
+    updateTabsTitle();
 };
+
+let url = null,
+    previousTabTitle = null;
+let updateNoPageChangedTabTitle = function (tabId, changeInfo, tab) {
+    if (tab.title === null) return;
+    if (!pageChanged && previousTabTitle !== tab.title
+        && getOriginalTitle(tab.title).length > 0
+        && !tabsTitlePrefix.includes(tab.title + ' ')) {
+        updateTabsTitle();
+        url = tab.url;
+        previousTabTitle = tab.title;
+    } else if (isValidUrl(tab.title) || url !== tab.url && previousTabTitle !== tab.title) {
+        pageChanged = false;
+        url = null;
+    }
+}
 
 chrome.tabs.onCreated.addListener(setParentTab);
 chrome.tabs.onRemoved.addListener(updateTabsTitle);
 chrome.tabs.onMoved.addListener(updateTabsTitle);
 chrome.tabs.onAttached.addListener(updateTabsTitle);
 chrome.tabs.onDetached.addListener(updateTabsTitle);
-// chrome.tabs.onUpdated.addListener(((tabId, changeInfo, tab) => {
-//     chrome.tabs.executeScript(tabId,
-//         {code: `history.pushState({page: 1}, "title 1", "?page=1"`},
-//         _=> {return chrome.runtime.lastError});
-// }));
+chrome.tabs.onUpdated.addListener(updateNoPageChangedTabTitle);

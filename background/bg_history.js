@@ -53,7 +53,6 @@ function updateTabHistory (tab) {
         } else
             history.set(tab.id, [newHistoryEntry]);
     }
-    chrome.tabs.sendMessage(tab.id, {tabHistory: history.get(tab.id)}, null);
 }
 
 function updateClosedTabHistory (tabId) {
@@ -72,6 +71,22 @@ chrome.extension.onMessage.addListener(function (message, sender) {
         chrome.sessions.restore(chrome.sessions[0]);
     } else if (message.type === "Title") {
         titles.set(sender.id, message.value);
+    } else if (message.type === "ShowCurrentTabHistory") {
+        chrome.tabs.sendMessage(sender.tab.id, {tabHistory: history.get(sender.tab.id), destineTabId: -1, currentPage: true}, null);
+    } else if (message.type === "ExecuteCode") {
+        chrome.tabs.executeScript(message.destineTabId,
+            {code: message.code},
+            () => {
+                return chrome.runtime.lastError;
+            });
+    } else if (message.type === "DeleteLink") {
+        let tabHistory = message.tabId === -1 ? history.get(sender.tab.id):history.get(message.tabId);
+
+        for (let i = 0; i < tabHistory.length; i++) {
+            if (tabHistory[i][0] === message.href)
+                tabHistory.splice(i, 1);
+        }
+
     }
 });
 

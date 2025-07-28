@@ -3,7 +3,8 @@
     "version": "1.1",
     "description": "Revolutionary tabs manager.",
     "permissions": ["nativeMessaging", "debugger", "storage", "tabs", "sessions",
-         "file://*/*","http://*/*", "https://*/", "background", "history"],
+         "file://*/*","http://*/*", "https://*/", "background",
+        "history", "tabCapture", "activeTab"],
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
     "background": {
         "scripts": ["background/background.js", "background/bg_history.js", "lib/utils.js"],
@@ -18,8 +19,18 @@
             "matches": ["<all_urls>",  "*://*/*", "file://*/*"],
             "js": ["content/content.js", "content/history.js", "lib/utils.js"],
             "css": ["css/history.css"],
-            "run_at": "document_start"
+            "run_at": "document_start",
+            "all_frames": true
         }
     ],
+    "commands": {
+        "reload" : {
+            "suggested_key": {
+                "mac": "Shift+Alt+R",
+                "windows": "Alt+Shift+R"
+            },
+            "description": "Reload all pages."
+        }
+    },
     "manifest_version": 2
 }

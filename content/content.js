@@ -1,24 +1,73 @@
 // Created on 20/11/2019 by EssExx
 
+window.addEventListener('beforeunload', function () {
+    window.stop();
+    chrome.extension.sendMessage({
+        type: 'PageChanged',
+    }, null);
+
+    document.title = getOriginalTitle(document.title);
+    history.replaceState({}, '');
+});
+
+window.addEventListener("auxclick", function (event) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+
+    if (event.which === 2) {
+        chrome.extension.sendMessage({
+            type: 'KeyX',
+            target: null,
+            modifiers: null
+        }, null);
+    } else if (event.which === 4) {
+        document.dispatchEvent(
+            new KeyboardEvent("keydown", {
+                key: "Enter", keyCode: 13, code: "Enter", which: 13,
+                shiftKey: true, ctrlKey: false,  metaKey: false
+            }));
+    } else if (event.which === 5) {
+        document.dispatchEvent(
+            new KeyboardEvent("keydown", {
+                key: "b", keyCode: 66, code: "KeyB", which: 66,
+                shiftKey: true, ctrlKey: false,  metaKey: false
+            }));
+    }
+}, true);
+
+
 window.addEventListener('keydown', function (e) {
     const activeElement = document.activeElement;
+
+    if (document.location.href.includes("agar.io") && e.key === "w")
+        return;
 
     if (!isSelectable(activeElement) && !e.metaKey) {
         let type = null,
             target = keyCodes.indexOf(e.code);
+        if (target > -1) {
+            if (!isAlreadyExistsHistoryPanel() && keyCodes[target] !== 'Escape') {
+                if (target < 10)
+                    type = 'Digit';
+                else
+                    type = e.code;
 
-        if (target > -1 && !isAlreadyExistsHistoryPanel()) {
-            if (keyCodes[target] !== 'Escape') {
-                e.preventDefault();
-                e.stopImmediatePropagation();
-            }
+                if (keyCodes[target] !== 'KeyQ') {
+                  e.preventDefault();
+                  e.stopImmediatePropagation();
+                }
+            } else if (keyCodes[target] !== 'Escape') {
+                if (target >= 10) {
+                    type = e.code;
 
-            if (target < 10)
-                type = 'Digit';
-            else
+                    if (keyCodes[target] !== 'KeyQ') {
+                      e.preventDefault();
+                      e.stopImmediatePropagation();
+                    } 
+                }
+            } else if (keyCodes[target] === 'Escape')
                 type = e.code;
 
-            target = keyCodes.indexOf(e.code);
             chrome.extension.sendMessage({
                 type: type,
                 target: target,
@@ -27,28 +76,3 @@ window.addEventListener('keydown', function (e) {
         }
     }
 }, true);
-
-document.addEventListener('DOMContentLoaded', updateTabTitle);
-
-setInterval(() => {
-    if (window.location.href.includes('youtube.com')
-        || window.location.href.includes('reddit.com')
-        || window.location.href.includes('zhihu.com')
-        || window.location.href.includes('instagram'))
-        updateTabTitle()
-}, 100);
-
-
-window.addEventListener('beforeunload', function () {
-    document.title = getOriginalTitle(document.title);
-    history.replaceState({}, '');
-});
-
-
-function updateTabTitle() {
-    chrome.extension.sendMessage({
-        type: 'GetTabTitlePrefix'
-    }, (response) => {
-        document.title = response.prefix + getOriginalTitle(document.title);
-    })
-}
