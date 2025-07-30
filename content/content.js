@@ -2,7 +2,7 @@
 
 window.addEventListener('beforeunload', function () {
     window.stop();
-    chrome.extension.sendMessage({
+    chrome.runtime.sendMessage({
         type: 'PageChanged',
     }, null);
 
@@ -15,7 +15,7 @@ window.addEventListener("auxclick", function (event) {
     event.stopImmediatePropagation();
 
     if (event.which === 2) {
-        chrome.extension.sendMessage({
+        chrome.runtime.sendMessage({
             type: 'KeyX',
             target: null,
             modifiers: null
@@ -68,7 +68,7 @@ window.addEventListener('keydown', function (e) {
             } else if (keyCodes[target] === 'Escape')
                 type = e.code;
 
-            chrome.extension.sendMessage({
+            chrome.runtime.sendMessage({
                 type: type,
                 target: target,
                 modifiers: getKeyEventModifiers(e)

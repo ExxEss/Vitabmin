@@ -30,7 +30,7 @@ window.addEventListener('keydown', function (e) {
         && !isAlreadyExistsHistoryPanel()) {
         e.preventDefault();
         e.stopImmediatePropagation();
-        chrome.extension.sendMessage({type: "ShowCurrentTabHistory"}, null);
+        chrome.runtime.sendMessage({type: "ShowCurrentTabHistory"}, null);
     } else if (isSingleKeyEvent(e) && e.key !== 'x' && (e.key === 'Escape'
         || e.key === 'c' || e.key === 'w'
         || isNumber(e))
@@ -50,7 +50,7 @@ window.addEventListener('keydown', function (e) {
             history.style.background = hoverColor;
 
             if (destineTabId !== -1) {
-                chrome.extension.sendMessage({type: "ExecuteCode",
+                chrome.runtime.sendMessage({type: "ExecuteCode",
                     destineTabId: destineTabId,
                     code:  `window.location.href = "${history.childNodes[0].href}"`},
                     () => {destineTabId = -1});
@@ -60,7 +60,7 @@ window.addEventListener('keydown', function (e) {
         }
         removeHistoryPanel();
     } else if (isSingleKeyEvent(e) && e.key === 'z') {
-        chrome.extension.sendMessage({type: "Restore"}, null);
+        chrome.runtime.sendMessage({type: "Restore"}, null);
     }
 },true);
 
@@ -75,7 +75,7 @@ window.onscroll = () => {
         removeHistoryPanel();
 };
 
-chrome.extension.onMessage.addListener(function (message) {
+chrome.runtime.onMessage.addListener(function (message) {
     if (message.tabHistory !== undefined) {
         historyPanel.innerHTML = '';
     }
@@ -111,7 +111,7 @@ window.setInterval(function () {
         for (let i = 0; i < h.length; i++) {
             if (h[i] !== undefined && h[i].innerText && h[i].innerText !== "") {
                 document.title = h[i].innerText;
-                chrome.extension.sendMessage({type: "Title", value: h[i].innerText});
+                chrome.runtime.sendMessage({type: "Title", value: h[i].innerText});
                 return;
             }
         }
@@ -155,7 +155,7 @@ let createHistoryEntry = function (entry, count) {
         }
 
         if (destineTabId !== -1) {
-            chrome.extension.sendMessage({
+            chrome.runtime.sendMessage({
                 type: "ExecuteCode",
                 destineTabId: destineTabId,
                 code: `window.location.href = "${link.href}"`
@@ -171,7 +171,7 @@ let createHistoryEntry = function (entry, count) {
         e.stopImmediatePropagation();
 
         history.parentNode.removeChild(history);
-        chrome.extension.sendMessage({type: "DeleteLink",
+        chrome.runtime.sendMessage({type: "DeleteLink",
             href: link.href,
             tabId: destineTabId
         }, null);

@@ -2,21 +2,21 @@
     "name": "Vitabmin",
     "version": "1.1",
     "description": "Revolutionary tabs manager.",
-    "permissions": ["nativeMessaging", "debugger", "storage", "tabs", "sessions",
-         "file://*/*","http://*/*", "https://*/", "background",
-        "history", "tabCapture", "activeTab"],
-    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
-    "background": {
-        "scripts": ["background/background.js", "background/bg_history.js", "lib/utils.js"],
-        "persistent": true
+    "permissions": ["storage", "tabs", "sessions", "history", "tabCapture", "activeTab", "scripting"],
+    "host_permissions": ["<all_urls>"],
+    "content_security_policy": {
+        "extension_pages": "script-src 'self'; object-src 'self'"
     },
-    "browser_action": {
+    "background": {
+        "service_worker": "background/service_worker.js"
+    },
+    "action": {
         "default_icon": "images/vitabmin.png",
         "default_popup": "html/popup.html"
     },
     "content_scripts": [
         {
-            "matches": ["<all_urls>",  "*://*/*", "file://*/*"],
+            "matches": ["<all_urls>"],
             "js": ["content/content.js", "content/history.js", "lib/utils.js"],
             "css": ["css/history.css"],
             "run_at": "document_start",
@@ -32,5 +32,5 @@
             "description": "Reload all pages."
         }
     },
-    "manifest_version": 2
+    "manifest_version": 3
 }
